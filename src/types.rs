@@ -72,10 +72,19 @@ pub trait IntoColumnRef {
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone)]
 pub enum TableRef {
+    /// Table identifier without any schema / database prefix
     Table(DynIden),
+    /// Table identifier with schema (for Postgres) prefix
     SchemaTable(DynIden, DynIden),
+    /// Table identifier with database (for MySQL and SQLite) prefix
+    DatabaseTable(DynIden, DynIden),
+    /// Table identifier with alias
     TableAlias(DynIden, DynIden),
+    /// Table identifier with schema (for Postgres) prefix and alias
     SchemaTableAlias(DynIden, DynIden, DynIden),
+    /// Table identifier with database (for MySQL and SQLite) prefix and alias
+    DatabaseTableAlias(DynIden, DynIden, DynIden),
+    /// Subquery with alias
     SubQuery(SelectStatement, DynIden),
 }
 
@@ -290,8 +299,14 @@ impl TableRef {
             Self::SchemaTable(schema, table) => {
                 Self::SchemaTableAlias(schema, table, alias.into_iden())
             }
+            Self::DatabaseTable(schema, table) => {
+                Self::DatabaseTableAlias(schema, table, alias.into_iden())
+            }
             Self::SchemaTableAlias(schema, table, _) => {
                 Self::SchemaTableAlias(schema, table, alias.into_iden())
+            }
+            Self::DatabaseTableAlias(schema, table, _) => {
+                Self::DatabaseTableAlias(schema, table, alias.into_iden())
             }
             Self::SubQuery(statement, _) => Self::SubQuery(statement, alias.into_iden()),
         }

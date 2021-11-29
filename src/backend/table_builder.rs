@@ -61,6 +61,11 @@ pub trait TableBuilder: IndexBuilder + ForeignKeyBuilder + QuotedBuilder {
             TableRef::SchemaTable(_, table) => {
                 table.prepare(sql, self.quote());
             }
+            TableRef::DatabaseTable(db, table) => {
+                db.prepare(sql, self.quote());
+                write!(sql, ".").unwrap();
+                table.prepare(sql, self.quote());
+            }
             _ => panic!("Not supported"),
         }
     }
