@@ -311,6 +311,15 @@ impl TableRef {
             Self::SubQuery(statement, _) => Self::SubQuery(statement, alias.into_iden()),
         }
     }
+
+    /// Helper method for creating [TableRef::DatabaseTable]
+    pub fn db_tbl<D, T>(db: D, tbl: T) -> Self
+    where
+        D: IntoIden + 'static,
+        T: IntoIden + 'static,
+    {
+        Self::DatabaseTable(db.into_iden(), tbl.into_iden())
+    }
 }
 
 impl Alias {
